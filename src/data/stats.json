@@ -20,38 +20,53 @@
     { "name": "project-bluefin", "stargazerCount": 1500, "forkCount": 200, "pushedAt": "2026-03-20T10:00:00Z", "primaryLanguage": { "name": "Shell", "color": "#89e051" } },
     { "name": "foss-united", "stargazerCount": 300, "forkCount": 50, "pushedAt": "2026-03-15T10:00:00Z", "primaryLanguage": { "name": "Python", "color": "#3572A5" } }
   ],
-  "myTopRepos": [
-    { "name": "project-bluefin", "myCommitCount": 420, "stargazerCount": 1500, "forkCount": 200, "primaryLanguage": { "name": "Shell", "color": "#89e051" } },
-    { "name": "foss-united", "myCommitCount": 310, "stargazerCount": 300, "forkCount": 50, "primaryLanguage": { "name": "Python", "color": "#3572A5" } },
-    { "name": "dotfiles", "myCommitCount": 180, "stargazerCount": 12, "forkCount": 2, "primaryLanguage": { "name": "Shell", "color": "#89e051" } }
-  ],
-  "myTopForks": [
-    { "name": "linux", "myCommitCount": 95, "parentNameWithOwner": "torvalds/linux", "stargazerCount": 0, "primaryLanguage": { "name": "C", "color": "#555555" } },
-    { "name": "systemd", "myCommitCount": 40, "parentNameWithOwner": "systemd/systemd", "stargazerCount": 0, "primaryLanguage": { "name": "C", "color": "#555555" } }
+  "myCommitStats": [
+    {
+      "name": "project-bluefin", "isFork": false, "parentNameWithOwner": "",
+      "stargazerCount": 1500, "forkCount": 200,
+      "primaryLanguage": { "name": "Shell", "color": "#89e051" },
+      "commits": { "total": 420, "d7": 8, "d30": 35, "d90": 90, "d180": 200, "d365": 380 }
+    },
+    {
+      "name": "foss-united", "isFork": false, "parentNameWithOwner": "",
+      "stargazerCount": 300, "forkCount": 50,
+      "primaryLanguage": { "name": "Python", "color": "#3572A5" },
+      "commits": { "total": 310, "d7": 3, "d30": 18, "d90": 60, "d180": 140, "d365": 280 }
+    },
+    {
+      "name": "linux", "isFork": true, "parentNameWithOwner": "torvalds/linux",
+      "stargazerCount": 0, "forkCount": 0,
+      "primaryLanguage": { "name": "C", "color": "#555555" },
+      "commits": { "total": 95, "d7": 2, "d30": 10, "d90": 30, "d180": 60, "d365": 90 }
+    },
+    {
+      "name": "dotfiles", "isFork": false, "parentNameWithOwner": "",
+      "stargazerCount": 12, "forkCount": 2,
+      "primaryLanguage": { "name": "Shell", "color": "#89e051" },
+      "commits": { "total": 180, "d7": 1, "d30": 8, "d90": 25, "d180": 70, "d365": 150 }
+    },
+    {
+      "name": "systemd", "isFork": true, "parentNameWithOwner": "systemd/systemd",
+      "stargazerCount": 0, "forkCount": 0,
+      "primaryLanguage": { "name": "C", "color": "#555555" },
+      "commits": { "total": 40, "d7": 0, "d30": 2, "d90": 8, "d180": 20, "d365": 35 }
+    }
   ],
   "collaborators": [
     {
-      "login": "alice",
-      "name": "Alice",
+      "login": "alice", "name": "Alice",
       "avatarUrl": "https://avatars.githubusercontent.com/u/1?v=4",
       "count": 45,
-      "repos": [
-        { "name": "project-bluefin", "commits": 30 },
-        { "name": "foss-united", "commits": 15 }
-      ],
+      "repos": [{ "name": "project-bluefin", "commits": 30 }, { "name": "foss-united", "commits": 15 }],
       "prs": [
-        { "number": 42, "title": "Add dark mode support", "state": "MERGED", "url": "https://github.com/hanthor/project-bluefin/pull/42", "repoName": "project-bluefin", "createdAt": "2025-11-10T00:00:00Z" },
-        { "number": 55, "title": "Fix memory leak in handler", "state": "MERGED", "url": "https://github.com/hanthor/foss-united/pull/55", "repoName": "foss-united", "createdAt": "2025-12-01T00:00:00Z" }
+        { "number": 42, "title": "Add dark mode support", "state": "MERGED", "url": "https://github.com/hanthor/project-bluefin/pull/42", "repoName": "project-bluefin", "createdAt": "2025-11-10T00:00:00Z" }
       ]
     },
     {
-      "login": "bob",
-      "name": "Bob",
+      "login": "bob", "name": "Bob",
       "avatarUrl": "https://avatars.githubusercontent.com/u/2?v=4",
       "count": 32,
-      "repos": [
-        { "name": "project-bluefin", "commits": 32 }
-      ],
+      "repos": [{ "name": "project-bluefin", "commits": 32 }],
       "prs": [
         { "number": 18, "title": "Refactor build system", "state": "OPEN", "url": "https://github.com/hanthor/project-bluefin/pull/18", "repoName": "project-bluefin", "createdAt": "2026-01-15T00:00:00Z" }
       ]

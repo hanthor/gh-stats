@@ -10,11 +10,21 @@ import {
 import statsData from './data/stats.json';
 import CollaboratorModal, { type Collaborator } from './CollaboratorModal';
 
+type Period = 'd7' | 'd30' | 'd90' | 'd180' | 'd365' | 'total';
+const PERIODS: { key: Period; label: string }[] = [
+  { key: 'd7',   label: '7D'  },
+  { key: 'd30',  label: '1M'  },
+  { key: 'd90',  label: '90D' },
+  { key: 'd180', label: '6M'  },
+  { key: 'd365', label: '1Y'  },
+];
+
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export default function App() {
-  const { user, yearlyStats, recentRepos, topRepos, myTopRepos, myTopForks, collaborators, updatedAt } = statsData;
+  const { user, yearlyStats, recentRepos, topRepos, myCommitStats, collaborators, updatedAt } = statsData;
   const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
+  const [commitPeriod, setCommitPeriod] = useState<Period>('d365');
   const closeModal = useCallback(() => setSelectedCollaborator(null), []);
 
   const totalCommits = useMemo(() =>
@@ -34,8 +44,11 @@ export default function App() {
     return Array.from(langMap.values()).sort((a, b) => b.count - a.count);
   }, [topRepos]);
 
-  const maxMyCommits = myTopRepos[0]?.myCommitCount ?? 1;
-  const maxForkCommits = myTopForks[0]?.myCommitCount ?? 1;
+  const sortedCommitStats = useMemo(() =>
+    [...myCommitStats].sort((a, b) => b.commits[commitPeriod] - a.commits[commitPeriod]),
+  [myCommitStats, commitPeriod]);
+
+  const maxCommits = sortedCommitStats[0]?.commits[commitPeriod] ?? 1;
 
   return (
     <>
@@ -127,95 +140,75 @@ export default function App() {
           </section>
         </div>
 
-        {/* Most committed repos + forks */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center gap-2 mb-6">
+        {/* Most committed repos & forks — combined with period selector */}
+        <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
               <GitCommitHorizontal className="text-indigo-500" />
-              <h2 className="text-lg font-semibold">Your Most Committed Repos</h2>
+              <h2 className="text-lg font-semibold">Most Committed Repos & Forks</h2>
             </div>
-            <div className="space-y-3">
-              {myTopRepos.map((repo, i) => (
-                <a
-                  key={repo.name}
-                  href={`https://github.com/${user.login}/${repo.name}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 group"
+            <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+              {PERIODS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setCommitPeriod(key)}
+                  className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                    commitPeriod === key
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
                 >
-                  <span className="text-xs font-bold text-slate-300 w-5 text-right flex-shrink-0">{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3">
+            {sortedCommitStats.map((repo, i) => (
+              <a
+                key={repo.name}
+                href={`https://github.com/${user.login}/${repo.name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 group"
+              >
+                <span className="text-xs font-bold text-slate-300 w-5 text-right flex-shrink-0">{i + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {repo.isFork && (
+                        <GitFork size={12} className="text-purple-400 flex-shrink-0" />
+                      )}
                       <span className="text-sm font-medium text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
                         {repo.name}
                       </span>
-                      <span className="text-xs text-slate-500 font-mono ml-2 flex-shrink-0">
-                        {repo.myCommitCount.toLocaleString()} commits
-                      </span>
                     </div>
-                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-indigo-400 rounded-full transition-all"
-                        style={{ width: `${(repo.myCommitCount / maxMyCommits) * 100}%` }}
-                      />
-                    </div>
+                    <span className="text-xs text-slate-500 font-mono ml-2 flex-shrink-0">
+                      {repo.commits[commitPeriod].toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${repo.isFork ? 'bg-purple-400' : 'bg-indigo-400'}`}
+                      style={{ width: `${(repo.commits[commitPeriod] / maxCommits) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
                     {repo.primaryLanguage && (
-                      <div className="flex items-center gap-1 mt-1">
+                      <span className="flex items-center gap-1 text-xs text-slate-400">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: repo.primaryLanguage.color }} />
-                        <span className="text-xs text-slate-400">{repo.primaryLanguage.name}</span>
-                      </div>
+                        {repo.primaryLanguage.name}
+                      </span>
+                    )}
+                    {repo.isFork && repo.parentNameWithOwner && (
+                      <span className="text-xs text-slate-400 truncate">↑ {repo.parentNameWithOwner}</span>
                     )}
                   </div>
-                </a>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center gap-2 mb-6">
-              <GitFork className="text-indigo-500" />
-              <h2 className="text-lg font-semibold">Your Most Committed Forks</h2>
-            </div>
-            {myTopForks.length === 0 ? (
-              <p className="text-sm text-slate-400">No fork commit data yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {myTopForks.map((fork, i) => (
-                  <a
-                    key={fork.name}
-                    href={`https://github.com/${user.login}/${fork.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 group"
-                  >
-                    <span className="text-xs font-bold text-slate-300 w-5 text-right flex-shrink-0">{i + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
-                          {fork.name}
-                        </span>
-                        <span className="text-xs text-slate-500 font-mono ml-2 flex-shrink-0">
-                          {fork.myCommitCount.toLocaleString()} commits
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-purple-400 rounded-full transition-all"
-                          style={{ width: `${(fork.myCommitCount / maxForkCommits) * 100}%` }}
-                        />
-                      </div>
-                      {fork.parentNameWithOwner && (
-                        <p className="text-xs text-slate-400 mt-1 truncate">
-                          ↑ {fork.parentNameWithOwner}
-                        </p>
-                      )}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            )}
-          </section>
-        </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
 
         {/* Top repos by stars + language breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
