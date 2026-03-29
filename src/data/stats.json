@@ -1,0 +1,41 @@
+{
+  "user": {
+    "name": "James Reilly",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/5840441?v=4",
+    "totalRepos": 133,
+    "totalPRs": 450,
+    "totalIssues": 280
+  },
+  "yearlyStats": [
+    {
+      "year": 2023,
+      "commits": 1200,
+      "prs": 150,
+      "issues": 80,
+      "repos": 15
+    },
+    {
+      "year": 2024,
+      "commits": 1500,
+      "prs": 200,
+      "issues": 120,
+      "repos": 20
+    },
+    {
+      "year": 2025,
+      "commits": 800,
+      "prs": 100,
+      "issues": 40,
+      "repos": 10
+    }
+  ],
+  "topRepos": [
+    { "name": "project-bluefin", "stargazerCount": 1500, "forkCount": 200, "primaryLanguage": { "name": "Shell", "color": "#89e051" } },
+    { "name": "foss-united", "stargazerCount": 300, "forkCount": 50, "primaryLanguage": { "name": "Python", "color": "#3572A5" } }
+  ],
+  "collaborators": [
+    { "login": "alice", "name": "Alice", "avatarUrl": "https://avatars.githubusercontent.com/u/1?v=4", "count": 45, "repos": ["project-bluefin"] },
+    { "login": "bob", "name": "Bob", "avatarUrl": "https://avatars.githubusercontent.com/u/2?v=4", "count": 32, "repos": ["project-bluefin", "foss-united"] }
+  ],
+  "updatedAt": "2026-03-29T10:00:00Z"
+}
