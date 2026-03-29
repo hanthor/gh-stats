@@ -92,31 +92,42 @@ async function fetchAllStats() {
 
   try {
     // 1. Basic user info + all repos (public only, owned, including forks)
-    const userData: any = await graphqlWithAuth(`
-      query($login: String!) {
-        user(login: $login) {
-          id
-          name
-          avatarUrl
-          repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC, orderBy: { field: PUSHED_AT, direction: DESC }) {
-            totalCount
-            nodes {
-              name
-              isFork
-              stargazerCount
-              forkCount
-              pushedAt
-              primaryLanguage { name color }
-              createdAt
-              parent { nameWithOwner }
+    // Use GraphqlResponseError fallback so org token restrictions don't abort the run.
+    let userData: any;
+    try {
+      userData = await graphqlWithAuth(`
+        query($login: String!) {
+          user(login: $login) {
+            id
+            name
+            avatarUrl
+            repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC, orderBy: { field: PUSHED_AT, direction: DESC }) {
+              totalCount
+              nodes {
+                name
+                isFork
+                stargazerCount
+                forkCount
+                pushedAt
+                primaryLanguage { name color }
+                createdAt
+                parent { nameWithOwner }
+              }
             }
+            pullRequests(states: [OPEN, CLOSED, MERGED]) { totalCount }
+            issues(states: [OPEN, CLOSED]) { totalCount }
+            contributionsCollection { contributionYears }
           }
-          pullRequests(states: [OPEN, CLOSED, MERGED]) { totalCount }
-          issues(states: [OPEN, CLOSED]) { totalCount }
-          contributionsCollection { contributionYears }
         }
+      `, { login: USERNAME });
+    } catch (e) {
+      if (e instanceof GraphqlResponseError && e.data?.user) {
+        console.warn(`Warning: partial GraphQL errors (likely org token restrictions). Continuing with available data.`);
+        userData = e.data;
+      } else {
+        throw e;
       }
-    `, { login: USERNAME });
+    }
 
     const user = userData.user;
     const userId: string = user.id;
@@ -132,28 +143,38 @@ async function fetchAllStats() {
     console.log(`Fetching ${years.length} years of contribution data...`);
     const yearlyStats = [];
     for (const year of years) {
-      const yearData: any = await graphqlWithAuth(`
-        query($login: String!, $from: DateTime!, $to: DateTime!) {
-          user(login: $login) {
-            contributionsCollection(from: $from, to: $to) {
-              totalCommitContributions
-              totalPullRequestContributions
-              totalIssueContributions
-              totalRepositoryContributions
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays { contributionCount date }
+      let yearData: any;
+      try {
+        yearData = await graphqlWithAuth(`
+          query($login: String!, $from: DateTime!, $to: DateTime!) {
+            user(login: $login) {
+              contributionsCollection(from: $from, to: $to) {
+                totalCommitContributions
+                totalPullRequestContributions
+                totalIssueContributions
+                totalRepositoryContributions
+                contributionCalendar {
+                  totalContributions
+                  weeks {
+                    contributionDays { contributionCount date }
+                  }
                 }
               }
             }
           }
+        `, {
+          login: USERNAME,
+          from: `${year}-01-01T00:00:00Z`,
+          to: `${year}-12-31T23:59:59Z`,
+        });
+      } catch (e) {
+        if (e instanceof GraphqlResponseError && e.data?.user) {
+          yearData = e.data;
+        } else {
+          console.warn(`  Skipping year ${year}: ${e}`);
+          continue;
         }
-      `, {
-        login: USERNAME,
-        from: `${year}-01-01T00:00:00Z`,
-        to: `${year}-12-31T23:59:59Z`,
-      });
+      }
       const stats = yearData.user.contributionsCollection;
       yearlyStats.push({
         year,
