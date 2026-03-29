@@ -1,18 +1,18 @@
 import { useMemo } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend, Cell, PieChart, Pie
+  BarChart, Bar, Cell, PieChart, Pie,
 } from 'recharts';
 import {
   Github, GitPullRequest, Star, GitFork, Users, Calendar,
-  ExternalLink, Info, GitCommitHorizontal, CircleDot
+  ExternalLink, Info, GitCommitHorizontal, CircleDot,
 } from 'lucide-react';
 import statsData from './data/stats.json';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export default function App() {
-  const { user, yearlyStats, topRepos, collaborators, updatedAt } = statsData;
+  const { user, yearlyStats, recentRepos, topRepos, collaborators, updatedAt } = statsData;
 
   const totalCommits = useMemo(() =>
     yearlyStats.reduce((acc, curr) => acc + curr.commits, 0),
@@ -74,21 +74,23 @@ export default function App() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={yearlyStats}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
-                <Legend />
-                <Line type="monotone" dataKey="commits" stroke="#8884d8" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="prs" stroke="#82ca9d" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="issues" stroke="#ff8042" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                <Line type="monotone" dataKey="commits" name="Commits" stroke="#8884d8" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="prs" name="PRs" stroke="#82ca9d" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="issues" name="Issues" stroke="#ff8042" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <div className="flex gap-4 mt-2 justify-center text-xs text-slate-500">
+            <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-[#8884d8] inline-block" /> Commits</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-[#82ca9d] inline-block" /> PRs</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-[#ff8042] inline-block" /> Issues</span>
+          </div>
         </section>
 
-        {/* Collaborators & Co-Authors */}
+        {/* Collaborators Bar Chart */}
         <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-2 mb-6">
             <Users className="text-indigo-500" />
@@ -101,7 +103,7 @@ export default function App() {
                 <XAxis type="number" hide />
                 <YAxis dataKey="login" type="category" width={80} axisLine={false} tickLine={false} />
                 <Tooltip
-                  cursor={{fill: '#f8fafc'}}
+                  cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
                 <Bar dataKey="count" fill="#8884d8" radius={[0, 4, 4, 0]}>
@@ -115,12 +117,12 @@ export default function App() {
         </section>
       </div>
 
+      {/* Top Repos + Language Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Top Repositories */}
         <section className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-2 mb-6">
             <Star className="text-yellow-500" />
-            <h2 className="text-lg font-semibold">Top Repositories</h2>
+            <h2 className="text-lg font-semibold">Top Repositories by Stars</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {topRepos.map((repo) => (
@@ -152,7 +154,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* Language Breakdown */}
         <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-2 mb-6">
             <GitCommitHorizontal className="text-indigo-500" />
@@ -161,15 +162,7 @@ export default function App() {
           <div className="h-[180px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie
-                  data={languageData}
-                  dataKey="count"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={70}
-                  innerRadius={35}
-                >
+                <Pie data={languageData} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={70} innerRadius={35}>
                   {languageData.map((lang, index) => (
                     <Cell key={lang.name} fill={lang.color || COLORS[index % COLORS.length]} />
                   ))}
@@ -195,13 +188,54 @@ export default function App() {
         </section>
       </div>
 
+      {/* All projects active in the past year */}
+      <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Calendar className="text-indigo-500" />
+            <h2 className="text-lg font-semibold">Active Projects — Past Year</h2>
+          </div>
+          <span className="text-sm text-slate-400 font-medium">{recentRepos.length} repos</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+          {recentRepos.map((repo) => (
+            <a
+              key={repo.name}
+              href={`https://github.com/${user.login}/${repo.name}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-300 transition-colors"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-slate-800 truncate flex items-center gap-1">
+                  {repo.name}
+                  <ExternalLink size={12} className="text-slate-400 flex-shrink-0" />
+                </p>
+                <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                  {repo.primaryLanguage && (
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: repo.primaryLanguage.color }}></span>
+                      {repo.primaryLanguage.name}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1"><Star size={11} /> {repo.stargazerCount}</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {new Date(repo.pushedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* Collaborator Details */}
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div className="flex items-center gap-2 mb-6">
           <Users className="text-indigo-500" />
           <h2 className="text-lg font-semibold">Collaborator Details</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto pr-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {collaborators.map((collab) => (
             <a
               key={collab.login}
@@ -227,7 +261,7 @@ export default function App() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) {
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
     <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 min-w-fit">
       <div className="p-2 bg-white rounded-lg shadow-sm">{icon}</div>

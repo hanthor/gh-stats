@@ -19,22 +19,26 @@ const graphqlWithAuth = graphql.defaults({
   },
 });
 
+const ONE_YEAR_AGO = new Date();
+ONE_YEAR_AGO.setFullYear(ONE_YEAR_AGO.getFullYear() - 1);
+
 async function fetchAllStats() {
   console.log(`Fetching stats for ${USERNAME}...`);
 
   try {
-    // 1. Basic Stats & Years of Contribution
+    // 1. Fetch all repos (up to 100) with push date for recency filtering
     const userQuery = `
       query($login: String!) {
         user(login: $login) {
           name
           avatarUrl
-          repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC, isFork: false) {
+          repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC, isFork: false, orderBy: { field: PUSHED_AT, direction: DESC }) {
             totalCount
             nodes {
               name
               stargazerCount
               forkCount
+              pushedAt
               primaryLanguage {
                 name
                 color
@@ -58,7 +62,14 @@ async function fetchAllStats() {
     const userData: any = await graphqlWithAuth(userQuery, { login: USERNAME });
     const user = userData.user;
     const years = user.contributionsCollection.contributionYears;
+    const allRepos = user.repositories.nodes;
 
+    // Repos active (pushed to) in the last year
+    const recentRepos = allRepos.filter(
+      (r: any) => new Date(r.pushedAt) >= ONE_YEAR_AGO
+    );
+
+    console.log(`${allRepos.length} total repos, ${recentRepos.length} active in the past year.`);
     console.log(`Found ${years.length} years of contributions. Fetching yearly data...`);
 
     // 2. Fetch Yearly Contribution Data
@@ -97,21 +108,20 @@ async function fetchAllStats() {
         prs: stats.totalPullRequestContributions,
         issues: stats.totalIssueContributions,
         repos: stats.totalRepositoryContributions,
-        calendar: stats.contributionCalendar
+        calendar: stats.contributionCalendar,
       });
     }
 
-    // 3. Fetch Collaborators (Commit Authors)
-    // For efficiency, we'll fetch commits from the top 20 repositories by stars
-    const topRepos = user.repositories.nodes
+    // 3. Fetch Collaborators from top 30 repos by stars
+    const topReposByStars = [...allRepos]
       .sort((a: any, b: any) => b.stargazerCount - a.stargazerCount)
-      .slice(0, 20);
+      .slice(0, 30);
 
-    console.log(`Fetching collaborators from top ${topRepos.length} repositories...`);
+    console.log(`Fetching collaborators from top ${topReposByStars.length} repos by stars...`);
 
-    const collaborators: Map<string, { login: string, name: string, avatarUrl: string, count: number, repos: Set<string> }> = new Map();
+    const collaborators: Map<string, { login: string; name: string; avatarUrl: string; count: number; repos: Set<string> }> = new Map();
 
-    for (const repo of topRepos) {
+    for (const repo of topReposByStars) {
       console.log(`  Processing ${repo.name}...`);
       const repoQuery = `
         query($owner: String!, $name: String!) {
@@ -153,7 +163,7 @@ async function fetchAllStats() {
                   name: authorNode.name,
                   avatarUrl: authorNode.user.avatarUrl,
                   count: 0,
-                  repos: new Set()
+                  repos: new Set(),
                 });
               }
               const collaborator = collaborators.get(login)!;
@@ -168,7 +178,7 @@ async function fetchAllStats() {
     }
 
     const collaboratorsList = Array.from(collaborators.values())
-      .map(c => ({ ...c, repos: Array.from(c.repos) }))
+      .map((c) => ({ ...c, repos: Array.from(c.repos) }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 20);
 
@@ -183,14 +193,19 @@ async function fetchAllStats() {
         totalIssues: user.issues.totalCount,
       },
       yearlyStats: yearlyStats.reverse(),
-      topRepos,
+      recentRepos,          // all repos active in the past year
+      topRepos: allRepos    // all repos (sorted by pushedAt desc) for language stats etc.
+        .sort((a: any, b: any) => b.stargazerCount - a.stargazerCount)
+        .slice(0, 20),
       collaborators: collaboratorsList,
       updatedAt: new Date().toISOString(),
     };
 
     const outputPath = path.join(process.cwd(), "src/data/stats.json");
     fs.writeFileSync(outputPath, JSON.stringify(finalData, null, 2));
-    console.log(`Success! Data saved to ${outputPath}`);
+    console.log(`\nSuccess! Data saved to ${outputPath}`);
+    console.log(`  ${recentRepos.length} repos active in past year`);
+    console.log(`  ${collaboratorsList.length} collaborators found`);
 
   } catch (error) {
     console.error("Error fetching data:", error);

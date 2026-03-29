@@ -30,9 +30,13 @@
       "repos": 10
     }
   ],
+  "recentRepos": [
+    { "name": "project-bluefin", "stargazerCount": 1500, "forkCount": 200, "pushedAt": "2026-03-20T10:00:00Z", "primaryLanguage": { "name": "Shell", "color": "#89e051" } },
+    { "name": "foss-united", "stargazerCount": 300, "forkCount": 50, "pushedAt": "2026-03-15T10:00:00Z", "primaryLanguage": { "name": "Python", "color": "#3572A5" } }
+  ],
   "topRepos": [
-    { "name": "project-bluefin", "stargazerCount": 1500, "forkCount": 200, "primaryLanguage": { "name": "Shell", "color": "#89e051" } },
-    { "name": "foss-united", "stargazerCount": 300, "forkCount": 50, "primaryLanguage": { "name": "Python", "color": "#3572A5" } }
+    { "name": "project-bluefin", "stargazerCount": 1500, "forkCount": 200, "pushedAt": "2026-03-20T10:00:00Z", "primaryLanguage": { "name": "Shell", "color": "#89e051" } },
+    { "name": "foss-united", "stargazerCount": 300, "forkCount": 50, "pushedAt": "2026-03-15T10:00:00Z", "primaryLanguage": { "name": "Python", "color": "#3572A5" } }
   ],
   "collaborators": [
     { "login": "alice", "name": "Alice", "avatarUrl": "https://avatars.githubusercontent.com/u/1?v=4", "count": 45, "repos": ["project-bluefin"] },
