@@ -1,4 +1,4 @@
-import { graphql } from "@octokit/graphql";
+import { graphql, GraphqlResponseError } from "@octokit/graphql";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
@@ -38,7 +38,10 @@ async function fetchCommitCountByUser(owner: string, repo: string, userId: strin
       }
     `, { owner, repo, userId });
     return data.repository?.defaultBranchRef?.target?.history?.totalCount ?? 0;
-  } catch {
+  } catch (e) {
+    if (e instanceof GraphqlResponseError) {
+      return e.data?.repository?.defaultBranchRef?.target?.history?.totalCount ?? 0;
+    }
     return 0;
   }
 }
@@ -88,14 +91,14 @@ async function fetchAllStats() {
   console.log(`Fetching stats for ${USERNAME}...`);
 
   try {
-    // 1. Basic user info + all repos (owned, including forks)
+    // 1. Basic user info + all repos (public only, owned, including forks)
     const userData: any = await graphqlWithAuth(`
       query($login: String!) {
         user(login: $login) {
           id
           name
           avatarUrl
-          repositories(first: 100, ownerAffiliations: OWNER, orderBy: { field: PUSHED_AT, direction: DESC }) {
+          repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC, orderBy: { field: PUSHED_AT, direction: DESC }) {
             totalCount
             nodes {
               name
