@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run fetch-data && tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "fetch-data": "NODE_OPTIONS='--loader ts-node/esm --no-warnings' ts-node scripts/fetch-github-data.ts"
