@@ -156,9 +156,9 @@ async function fetchAllStats() {
                   repos: new Set()
                 });
               }
-              const collabortor = collaborators.get(login)!;
-              collabortor.count++;
-              collabortor.repos.add(repo.name);
+              const collaborator = collaborators.get(login)!;
+              collaborator.count++;
+              collaborator.repos.add(repo.name);
             }
           }
         }
@@ -175,6 +175,7 @@ async function fetchAllStats() {
     // 4. Save Final Data
     const finalData = {
       user: {
+        login: USERNAME,
         name: user.name,
         avatarUrl: user.avatarUrl,
         totalRepos: user.repositories.totalCount,
