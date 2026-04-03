@@ -8,7 +8,11 @@ Growing up, my bedroom was full of half-disassembled electronics. Things that wo
 
 GitHub is the same thing, different medium. Repos accumulate the way capacitors and resistors used to — individually harmless, collectively suggestive of a problem.
 
-LLMs did not give me the tinkering habit. They removed the last speed bumps. The gap between "I wonder if I could build a thing that does X" and a working prototype used to be measured in weeks of fighting build systems and reading man pages and discovering that the library you need does not compile on your distro. Now it is measured in afternoons. Someone called it "petrol on ADHD" and I have not found a better description.
+I am not an artist. I am not a creator. The blank canvas is not exciting to me — it is frustrating. I have never once stared at an empty page and felt inspired. What I feel is stuck. I am far more at home when there is already something there to pull apart, modify, and reassemble into something slightly different.
+
+This carried over into code. I never took a computer science course. My degrees are in economics and agricultural business. I got into computers through sysadmin work — my job was making other people's software run, not writing my own. I got good at reading documentation, tracing errors, and understanding systems well enough to keep them running. I wrote scripts. I filed minor fix PRs on large codebases. But building something from a blank file was not really in my repertoire.
+
+LLMs changed that specific thing. Not by making me smarter or more creative — but by eliminating the blank canvas entirely. I describe the itch, and there is already something to react to. Something to pull apart. Something to modify. It turns out that was the only thing standing between me and shipping software. The gap between "I wonder if I could build a thing that does X" and a working prototype used to be measured in weeks of fighting build systems and reading man pages and discovering that the library you need does not compile on your distro. Now it is measured in afternoons. Someone called it "petrol on ADHD" and I have not found a better description.
 
 This is not a success story. It is a field report from someone who has shipped more code in six months than the rest of their life combined, and is still figuring out what that means.
 
