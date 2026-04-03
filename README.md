@@ -2,6 +2,78 @@
 
 A personal GitHub stats dashboard for the [hanthor](https://github.com/hanthor) org, built with React, TypeScript, Vite, and Recharts. Displays commit history, repository stats, top repos, language breakdown, and collaborator activity — all sourced from the GitHub GraphQL API at build time and deployed as a static site.
 
+---
+
+## Highlights — Oct 2025 → Apr 2026
+
+Six months of shipping. Here's what actually happened:
+
+### TunaOS: an enterprise Linux desktop, built from scratch
+Launched [tuna-os/tunaOS](https://github.com/tuna-os/tunaOS) — a bootc-native, cloud-native desktop OS for Enterprise Linux (RHEL/AlmaLinux). The org went from a skeleton to a full build pipeline in this window:
+- **fisherman** — a bootc-only installer backend replacing Anaconda
+- **tuna-installer** — GTK 4 / Libadwaita frontend for the installer
+- **bonito-x13s** — dedicated bootc image + live ISO for the Lenovo ThinkPad X13s (aarch64/Qualcomm)
+- **github-copr** — a self-hosted RPM build system using GitHub Actions and Cloudflare R2, because Copr wasn't enough
+- **chunkah** — an OCI re-layering tool for content-based layers (smaller, smarter image updates)
+- **dakota** — the Bluefin buildstream, forked into tuna-os for TunaOS builds
+- **first-setup** — GNOME initial-setup replacement for TunaOS
+
+### Bluefin LTS: 19 merged PRs upstream to ublue-os/bluefin-lts
+The most active external project by commit volume. Notable work:
+- Backported GNOME 49, then GNOME 50, with a full build pipeline (`GNOME_VERSION` build arg, new CI matrix, hwe/non-hwe variants)
+- Fixed GDM boot failures on EL10 bootc images (SELinux policy, mislabeled `/var/home`, DRACUT_TMPDIR export)
+- Switched the HWE variant from kmods-sig to the CoreOS kernel
+- Ported the ublue-os artwork pipeline to OCI image distribution
+- Added TuneD battery/AC auto-switching profiles
+- Migrated changelog generation off rechunker and onto SBOM-based tooling
+
+### bluefin-cli: built a cross-platform CLI from zero to Homebrew formula
+Started [hanthor/bluefin-cli](https://github.com/hanthor/bluefin-cli) in November 2025. By March 2026 it was:
+- Shipping via GoReleaser with automated winget manifests and Homebrew bottles (via `ublue-os/homebrew-experimental-tap`)
+- Supporting PowerShell/Windows with a ~2900ms → ~140ms profile load speedup after a full refactor
+- Built with Charmbracelet v2 (lipgloss, bubbletea), with multi-select install menus, fuzzy finder, and per-category UI
+- Using the Fedora countme protocol for anonymous usage telemetry
+- Documented cross-platform in projectbluefin/documentation
+
+### Pasar: a Linux-native Homebrew client
+Built [hanthor/Pasar](https://github.com/hanthor/Pasar) — a modern Homebrew GUI for Linux, with full macOS support added in March (native Apple Silicon app bundle, CI release workflow). Includes Brewfile viewing, installed-app icon fetching, and GitHub-avatar-based metadata.
+
+### Homelab monitoring
+Stood up [hanthor/homelab-monitoring](https://github.com/hanthor/homelab-monitoring) — Prometheus + Perses across four nodes (kanpur, karnataka, himachal, bihar), with Grafana on the Bihar hub, Loki co-located, and Tailscale for cross-node networking. Managed via Ansible through dotfiles.
+
+### Side projects and experiments
+- **telegramgo** — Go rewrite of mautrix-telegram, with relay/topic plumbing support for bridging Matrix rooms to Telegram forum topics
+- **oramalama** — lifecycle automation for RamaLama and OpenCode on Strix Halo (AMD AI) systems
+- **PSFileIcons** — a fast C# replacement for PowerShell Terminal-Icons using Nerd Font glyphs
+- **mattermost-matrix-bridge** — a Matrix-Mattermost bridge built on mautrix-go, enabling federation on free Mattermost instances
+- **pretalx-chart** — production-ready Helm chart for Pretalx conference management
+- **zerobrew** — contributed Linux support and tap/formula parsing to this experimental Homebrew alternative
+- **lima-container** — GNOME Remote Desktop over RDP in bootc builds, using gnome-remote-desktop system service at GDM
+- **x13s-bootc** — bootc image work for the ThinkPad X13s (Qualcomm aarch64)
+- **bluespeed / agentic-bluefin** — agentic/AI tooling experiments for maintaining Project Bluefin
+- Submitted an RFC to AlmaLinux ALESCo for alternative signed kernels
+
+### External contributions (merged)
+| Project | What |
+|---|---|
+| `ublue-os/bluefin-lts` | 19 PRs merged — GNOME 49/50, kernel fixes, SELinux, GDM, TuneD |
+| `ublue-os/homebrew-experimental-tap` | 7 PRs — bluefin-cli formula, Cask pipeline, bottle workflow |
+| `projectbluefin/dakota` | 7 PRs — chunkah integration, QEMU VM booting, multi-runner CI |
+| `tuna-os/github-copr` | 6 PRs — GNOME 49/50 RPM pipelines, GDM verification |
+| `ublue-os/homebrew-tap` | 3 PRs — antigravity URL handler, agy alias |
+| `projectbluefin/documentation` | 2 PRs — bluefin-cli cross-platform docs, indiaFOSS talk post |
+| `aedocw/epub2tts-kokoro` | Docker auto-detection support |
+| `lucasgelfond/zerobrew` | Linux support + bottle path fix |
+| `ublue-os/artwork` | OCI image distribution pipeline |
+| `projectbluefin/iso` | Multi-distro ISO build tooling |
+| `hazre/cinny` | Matrix webcam-off default |
+| `ublue-os/bluefin` | Brewfile dependency install step |
+
+### Pattern of work
+Almost everything here is in the bootc/OCI/immutable-Linux ecosystem — building, packaging, and deploying cloud-native desktop OS images. Heavy focus on Enterprise Linux desktop (EL10/AlmaLinux + GNOME), Homebrew tooling for Linux, and bridging the gap between container-native infrastructure and end-user desktop experience. Also a recurring theme of "the upstream tooling doesn't exist yet, so build it" — fisherman, github-copr, chunkah, oramalama.
+
+---
+
 ## Features
 
 - Yearly commit totals and per-repo commit counts across configurable time windows (7D / 1M / 90D / 6M / 1Y / all-time)
@@ -13,10 +85,10 @@ A personal GitHub stats dashboard for the [hanthor](https://github.com/hanthor) 
 ## Architecture
 
 ```
-scripts/fetch-github-data.ts   ← GitHub GraphQL API → src/data/stats.json
-src/App.tsx                    ← React dashboard, reads stats.json at build time
-src/CollaboratorModal.tsx      ← Per-collaborator detail modal
-.github/workflows/deploy.yml   ← Fetches data + builds + deploys to GitHub Pages
+scripts/fetch-github-data.ts   <- GitHub GraphQL API -> src/data/stats.json
+src/App.tsx                    <- React dashboard, reads stats.json at build time
+src/CollaboratorModal.tsx      <- Per-collaborator detail modal
+.github/workflows/deploy.yml   <- Fetches data + builds + deploys to GitHub Pages
 ```
 
 Data is fetched once (at CI build time) and baked into the static bundle. The site is deployed to GitHub Pages.
@@ -82,7 +154,7 @@ The data fetch script is hardcoded to the `hanthor` GitHub user. To adapt it for
 
 - [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vite.dev/)
-- [Recharts](https://recharts.org/) — charting
-- [Lucide React](https://lucide.dev/) — icons
+- [Recharts](https://recharts.org/) -- charting
+- [Lucide React](https://lucide.dev/) -- icons
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Octokit GraphQL](https://github.com/octokit/graphql.js) — GitHub API client
+- [Octokit GraphQL](https://github.com/octokit/graphql.js) -- GitHub API client
