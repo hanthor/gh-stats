@@ -32,7 +32,7 @@ This is not a success story. It is a field report from someone who has shipped m
 
 **[bluefin-cli](https://github.com/hanthor/bluefin-cli)** — A cross-platform TUI for setting up your terminal environment: colour themes, fonts, Nerd Font icons, the rewritten-in-Rust alternatives to standard Unix tools (eza instead of ls, bat instead of cat, that whole ecosystem). Runs on Linux, macOS, and Windows via PowerShell. The Windows build went from a 2900ms profile load time to 140ms after a full refactor. Ships via GoReleaser with automated Homebrew bottles and winget manifests. I built it hoping it would be a gateway drug — someone would install it on Windows, get a taste of what a properly configured terminal feels like, and wonder what else was possible. Maybe they would try Linux. It is a theory.
 
-## The Honest Bit
+## The Reality
 
 The combined codebase across these projects is tens of thousands of lines of code. Most of it runs on nobody's machine — including mine.
 
@@ -46,20 +46,20 @@ I do not have an answer to this. I am not sure anyone does yet.
 
 ## The Finale
 
-One afternoon I let Claude Opus open an upstream bug report without reading it carefully first. The report was about `systemd-repart` not creating partition block devices for loop devices — a real bug, a real problem I had actually hit while building the installer backend for TunaOS.
+Last week, I let Claude Opus open an upstream bug report without reading it carefully first. The report was about `systemd-repart` not creating partition block devices for loop devices — a real bug, a real problem I had actually hit while building the installer backend for TunaOS.
 
 The model opened it in `systemd/systemd` itself.
 
-That is the project maintained by Lennart Poettering. One of the most consequential and most argued-about figures in the history of Linux. A person who does not need random half-finished-project people filing issues on his tracker on a Tuesday afternoon.
+That is the project maintained by dozenos of people so I hoped it wasn't a big deal. But 3 days ago it go a reply from Lennart Poettering himself. One of the most consequential and most argued-about figures in the history of Linux. A person who does not need random half-finished-project people filing issues on his tracker on a Tuesday afternoon with a LLM.
 
-He replied. The issue is [systemd/systemd#41385](https://github.com/systemd/systemd/issues/41385).
+The issue is [systemd/systemd#41385](https://github.com/systemd/systemd/issues/41385).
 
-I had become an accidental nuisance to one of the most important projects in all of open source — not through malice, just through not paying attention while the model ran.
+I had become an accidental nuisance to one of the most important projects in all of open source — not through malice, just through not paying attention while the model ran and agreeing to a suggestion the model made.
 
-I am not sure if this is funny or a warning. Probably both.
+I got too caught up in the hype, don't do what i did.
 
 ## So
 
-It is very early days. Nobody knows how this turns out — not the researchers, not the maintainers, not the companies giving away tokens for free. The only honest thing to say is that it has changed what one person can do in an afternoon, and we are still figuring out whether that is good.
+It is very early days. Nobody knows how this turns out — It seems good that I can do know what I couldn't do a year ago. But I can't really finish any of my project since they've outstripped my bandwidth to polish and maintain them. As a new dad, I just don't have the time to spend hours and hours a week in fornt of a computer just for my hobbies. Maybe getting from 0 to 80% done has become way easier, but it's still just as hard if not harder to pring projects and products to 100% done.
 
 Thank you for coming to my talk.
